@@ -174,9 +174,13 @@ function formatBriefing(data) {
   return text
 }
 
-// SPA fallback - all routes serve index.html
-app.get('*', (req, res) => {
-  res.sendFile(join(__dirname, 'dist', 'index.html'))
+// SPA fallback - all routes serve index.html (Express 5 syntax)
+app.use((req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api')) {
+    res.sendFile(join(__dirname, 'dist', 'index.html'))
+  } else {
+    next()
+  }
 })
 
 app.listen(PORT, () => {
