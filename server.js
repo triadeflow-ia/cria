@@ -1,7 +1,6 @@
 import express from 'express'
 import cors from 'cors'
 import Anthropic from '@anthropic-ai/sdk'
-import { Client } from '@notionhq/client'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import dotenv from 'dotenv'
@@ -20,81 +19,21 @@ app.use(express.static(join(__dirname, 'dist')))
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
-// Notion
-const notionKey = process.env.NOTION_API_KEY
-const notion = notionKey ? new Client({ auth: notionKey }) : null
-const NOTION_DB_ID = process.env.NOTION_DATABASE_ID || 'fb310ef9af3440818163001cd4d11351'
-console.log(`[Notion] ${notion ? 'Connected' : 'NOT configured (missing NOTION_API_KEY)'} | DB: ${NOTION_DB_ID}`)
+// Webhook para captar briefings (n8n, Notion, etc)
+const WEBHOOK_URL = process.env.WEBHOOK_URL || ''
+if (WEBHOOK_URL) console.log('[Webhook] Configured:', WEBHOOK_URL.slice(0, 50) + '...')
 
-async function saveToNotion(briefing) {
-  if (!notion) return null
+async function sendWebhook(type, data) {
+  if (!WEBHOOK_URL) return
   try {
-    console.log('[Notion] Saving briefing for:', briefing.empresa)
-    const canais = Array.isArray(briefing.canais) ? briefing.canais : []
-    const props = {
-      'Empresa': { title: [{ text: { content: briefing.empresa || 'Sem nome' } }] },
-      'Status': { select: { name: 'Novo' } },
-      'Responsavel': { rich_text: [{ text: { content: briefing.responsavel || '' } }] },
-      'Nicho': { rich_text: [{ text: { content: briefing.nicho || '' } }] },
-      'Nome Agente': { rich_text: [{ text: { content: briefing.nome_agente || '' } }] },
-      'Instagram': { rich_text: [{ text: { content: briefing.instagram || '' } }] },
-      'Cidade': { rich_text: [{ text: { content: briefing.cidade || '' } }] },
-      'Volume Msgs/Dia': { rich_text: [{ text: { content: briefing.volume || '' } }] },
-    }
-    if (briefing.objetivo) props['Objetivo'] = { select: { name: briefing.objetivo } }
-    if (canais.length) props['Canais'] = { multi_select: canais.map(c => ({ name: c })) }
-    if (briefing.tom) props['Tom'] = { select: { name: briefing.tom } }
-    if (briefing.whatsapp) props['WhatsApp'] = { phone_number: briefing.whatsapp }
-    if (briefing.site) props['Site'] = { url: briefing.site }
-
-    const page = await notion.pages.create({
-      parent: { database_id: NOTION_DB_ID },
-      properties: props
+    await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, ...data, timestamp: new Date().toISOString() })
     })
-    console.log('[Notion] Page created:', page.id)
-
-    // Add briefing completo como conteudo da pagina
-    const briefingText = formatBriefing(briefing)
-    await notion.blocks.children.append({
-      block_id: page.id,
-      children: [
-        { heading_2: { rich_text: [{ text: { content: 'Briefing Completo' } }] } },
-        { code: { rich_text: [{ text: { content: briefingText.slice(0, 2000) } }], language: 'markdown' } },
-      ]
-    })
-    console.log('[Notion] Briefing content added')
-
-    return page.id
+    console.log(`[Webhook] Sent: ${type} | ${data.empresa || ''}`)
   } catch (err) {
-    console.error('[Notion] Save error:', err.message, err.body || '')
-    return null
-  }
-}
-
-async function updateNotionWithDocs(pageId, docs) {
-  if (!notion || !pageId) return
-  try {
-    await notion.pages.update({
-      page_id: pageId,
-      properties: { 'Status': { select: { name: 'Docs Gerados' } } }
-    })
-
-    const blocks = []
-    blocks.push({ divider: {} })
-    blocks.push({ heading_1: { rich_text: [{ text: { content: 'Documentos Gerados pela IA' } }] } })
-
-    for (const doc of docs) {
-      blocks.push({ heading_2: { rich_text: [{ text: { content: doc.title } }] } })
-      // Notion blocks have 2000 char limit — split if needed
-      const chunks = doc.content.match(/.{1,2000}/gs) || []
-      for (const chunk of chunks) {
-        blocks.push({ code: { rich_text: [{ text: { content: chunk } }], language: 'markdown' } })
-      }
-    }
-
-    await notion.blocks.children.append({ block_id: pageId, children: blocks.slice(0, 100) })
-  } catch (err) {
-    console.error('[Notion] Update error:', err.message, err.body || '')
+    console.error('[Webhook] Error:', err.message)
   }
 }
 
@@ -105,8 +44,8 @@ app.post('/api/generate', async (req, res) => {
       return res.status(400).json({ error: 'Briefing data is required' })
     }
 
-    // Save briefing to Notion
-    const notionPageId = await saveToNotion(briefing)
+    // Send briefing via webhook
+    await sendWebhook('briefing', { empresa: briefing.empresa, briefing })
 
     const briefingText = formatBriefing(briefing)
 
@@ -185,8 +124,8 @@ Responda APENAS com os 5 documentos separados por ===DOC_SEPARATOR===. Comece ca
       content
     }))
 
-    // Update Notion with generated docs
-    await updateNotionWithDocs(notionPageId, result)
+    // Send generated docs via webhook
+    await sendWebhook('docs_generated', { empresa: briefing.empresa, docs: result })
 
     res.json({
       success: true,
