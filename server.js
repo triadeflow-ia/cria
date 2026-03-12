@@ -27,25 +27,29 @@ const NOTION_DB_ID = process.env.NOTION_DATABASE_ID || 'fb310ef9af3440818163001c
 async function saveToNotion(briefing) {
   if (!notion) return null
   try {
+    console.log('[Notion] Saving briefing for:', briefing.empresa)
     const canais = Array.isArray(briefing.canais) ? briefing.canais : []
+    const props = {
+      'Empresa': { title: [{ text: { content: briefing.empresa || 'Sem nome' } }] },
+      'Status': { select: { name: 'Novo' } },
+      'Responsavel': { rich_text: [{ text: { content: briefing.responsavel || '' } }] },
+      'Nicho': { rich_text: [{ text: { content: briefing.nicho || '' } }] },
+      'Nome Agente': { rich_text: [{ text: { content: briefing.nome_agente || '' } }] },
+      'Instagram': { rich_text: [{ text: { content: briefing.instagram || '' } }] },
+      'Cidade': { rich_text: [{ text: { content: briefing.cidade || '' } }] },
+      'Volume Msgs/Dia': { rich_text: [{ text: { content: briefing.volume || '' } }] },
+    }
+    if (briefing.objetivo) props['Objetivo'] = { select: { name: briefing.objetivo } }
+    if (canais.length) props['Canais'] = { multi_select: canais.map(c => ({ name: c })) }
+    if (briefing.tom) props['Tom'] = { select: { name: briefing.tom } }
+    if (briefing.whatsapp) props['WhatsApp'] = { phone_number: briefing.whatsapp }
+    if (briefing.site) props['Site'] = { url: briefing.site }
+
     const page = await notion.pages.create({
       parent: { database_id: NOTION_DB_ID },
-      properties: {
-        'Empresa': { title: [{ text: { content: briefing.empresa || 'Sem nome' } }] },
-        'Status': { select: { name: 'Novo' } },
-        'Responsavel': { rich_text: [{ text: { content: briefing.responsavel || '' } }] },
-        'Nicho': { rich_text: [{ text: { content: briefing.nicho || '' } }] },
-        'Objetivo': briefing.objetivo ? { select: { name: briefing.objetivo } } : undefined,
-        'Canais': canais.length ? { multi_select: canais.map(c => ({ name: c })) } : undefined,
-        'Nome Agente': { rich_text: [{ text: { content: briefing.nome_agente || '' } }] },
-        'Tom': briefing.tom ? { select: { name: briefing.tom } } : undefined,
-        'WhatsApp': { phone_number: briefing.whatsapp || null },
-        'Instagram': { rich_text: [{ text: { content: briefing.instagram || '' } }] },
-        'Site': briefing.site ? { url: briefing.site } : undefined,
-        'Cidade': { rich_text: [{ text: { content: briefing.cidade || '' } }] },
-        'Volume Msgs/Dia': { rich_text: [{ text: { content: briefing.volume || '' } }] },
-      }
+      properties: props
     })
+    console.log('[Notion] Page created:', page.id)
 
     // Add briefing completo como conteudo da pagina
     const briefingText = formatBriefing(briefing)
@@ -56,10 +60,11 @@ async function saveToNotion(briefing) {
         { code: { rich_text: [{ text: { content: briefingText.slice(0, 2000) } }], language: 'markdown' } },
       ]
     })
+    console.log('[Notion] Briefing content added')
 
     return page.id
   } catch (err) {
-    console.error('Notion save error:', err.message)
+    console.error('[Notion] Save error:', err.message, err.body || '')
     return null
   }
 }
@@ -87,7 +92,7 @@ async function updateNotionWithDocs(pageId, docs) {
 
     await notion.blocks.children.append({ block_id: pageId, children: blocks.slice(0, 100) })
   } catch (err) {
-    console.error('Notion update error:', err.message)
+    console.error('[Notion] Update error:', err.message, err.body || '')
   }
 }
 
