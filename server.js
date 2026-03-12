@@ -21,8 +21,10 @@ app.use(express.static(join(__dirname, 'dist')))
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 // Notion
-const notion = process.env.NOTION_API_KEY ? new Client({ auth: process.env.NOTION_API_KEY }) : null
+const notionKey = process.env.NOTION_API_KEY
+const notion = notionKey ? new Client({ auth: notionKey }) : null
 const NOTION_DB_ID = process.env.NOTION_DATABASE_ID || 'fb310ef9af3440818163001cd4d11351'
+console.log(`[Notion] ${notion ? 'Connected' : 'NOT configured (missing NOTION_API_KEY)'} | DB: ${NOTION_DB_ID}`)
 
 async function saveToNotion(briefing) {
   if (!notion) return null
