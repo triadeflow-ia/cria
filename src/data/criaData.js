@@ -2,8 +2,6 @@ export const phases = [
   {
     id: 1,
     name: 'Descoberta',
-    icon: '🔍',
-    color: 'emerald',
     time: '1-2h',
     description: 'Entender o negocio, atendimento atual e objetivo do agente',
     deliverable: 'Briefing CRIA preenchido',
@@ -17,8 +15,6 @@ export const phases = [
   {
     id: 2,
     name: 'Arquitetura',
-    icon: '📐',
-    color: 'orange',
     time: '2-4h',
     description: 'Projetar fluxo conversacional, intencoes e integracoes',
     deliverable: 'Mapa de Fluxo + Intencoes + Integracoes',
@@ -33,8 +29,6 @@ export const phases = [
   {
     id: 3,
     name: 'Persona',
-    icon: '🎭',
-    color: 'purple',
     time: '1-2h',
     description: 'Criar identidade, tom de voz e system prompt do agente',
     deliverable: 'Documento de Persona + System Prompt',
@@ -48,8 +42,6 @@ export const phases = [
   {
     id: 4,
     name: 'Base de Conhecimento',
-    icon: '📚',
-    color: 'yellow',
     time: '2-4h',
     description: 'Construir a memoria do agente com FAQ, catalogo e politicas',
     deliverable: 'KB estruturada + testada',
@@ -63,8 +55,6 @@ export const phases = [
   {
     id: 5,
     name: 'Construcao',
-    icon: '🛠️',
-    color: 'blue',
     time: '1-5 dias',
     description: 'Implementar o agente na plataforma escolhida',
     deliverable: 'Agente funcional em ambiente de teste',
@@ -79,8 +69,6 @@ export const phases = [
   {
     id: 6,
     name: 'Validacao',
-    icon: '🧪',
-    color: 'red',
     time: '1-2 dias',
     description: 'Testar com 10 cenarios obrigatorios + red teaming',
     deliverable: 'Relatorio de Auditoria (score + cenarios)',
@@ -94,8 +82,6 @@ export const phases = [
   {
     id: 7,
     name: 'Lancamento',
-    icon: '🚀',
-    color: 'emerald',
     time: 'Ongoing',
     description: 'Go-live controlado + metricas + otimizacao continua',
     deliverable: 'Agente em producao + dashboard de metricas',
@@ -112,7 +98,6 @@ export const platforms = [
   {
     id: 'ghl',
     name: 'GHL Conversation AI',
-    icon: '⚡',
     type: 'No-Code',
     deployTime: '1-3 dias',
     complexity: 'Baixa',
@@ -121,12 +106,10 @@ export const platforms = [
     rag: 'Basico (1-3 chunks)',
     managedBy: 'Time nao-tecnico',
     bestFor: 'FAQ, qualificacao, agendamento, clientes GHL',
-    color: 'emerald',
   },
   {
     id: 'n8n',
     name: 'n8n + AI Agent',
-    icon: '🔗',
     type: 'Low-Code',
     deployTime: '3-7 dias',
     complexity: 'Media',
@@ -135,12 +118,10 @@ export const platforms = [
     rag: 'Vector stores',
     managedBy: 'Time semi-tecnico',
     bestFor: 'Automacao + AI, multi-sistema, self-hosting',
-    color: 'blue',
   },
   {
     id: 'langgraph',
     name: 'Python + LangGraph',
-    icon: '🐍',
     type: 'Full-Code',
     deployTime: '7-21 dias',
     complexity: 'Alta',
@@ -149,7 +130,6 @@ export const platforms = [
     rag: 'Total controle',
     managedBy: 'Desenvolvedor',
     bestFor: 'Multi-agent, RAG avancado, SaaS, alto volume',
-    color: 'purple',
   },
 ]
 

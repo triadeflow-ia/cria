@@ -1,148 +1,162 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, Zap, Clock, Target } from 'lucide-react'
 import { phases, platforms, metrics } from '../data/criaData'
-
-const colorMap = {
-  emerald: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  orange: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-  purple: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  yellow: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-  blue: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  red: 'bg-red-500/10 text-red-400 border-red-500/20',
-}
 
 export default function Home() {
   return (
-    <div>
+    <div className="selection:bg-brand-400/30">
       {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/5" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 relative">
-          <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-1.5 mb-6">
-              <span className="text-lg">🧬</span>
-              <span className="text-sm font-medium text-primary-light">Framework v1.0</span>
-            </div>
-            <h1 className="text-4xl sm:text-6xl font-black text-white mb-6 leading-tight">
-              Metodo <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-light to-accent">CRIA</span>
-            </h1>
-            <p className="text-lg sm:text-xl text-slate-300 mb-3 font-semibold">
-              Criacao Rapida de Inteligencia para Atendimento
-            </p>
-            <p className="text-base sm:text-lg text-slate-400 mb-10 max-w-2xl mx-auto">
-              Framework de 7 fases para criar agentes de IA conversacional do zero ao go-live.
-              WhatsApp, Instagram, SMS, Web Chat.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/onboarding"
-                className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white font-semibold px-8 py-3.5 rounded-xl transition-colors no-underline"
-              >
-                Iniciar Onboarding <ArrowRight size={18} />
-              </Link>
-              <Link
-                to="/prompt-generator"
-                className="inline-flex items-center justify-center gap-2 bg-surface-lighter hover:bg-surface-lighter/80 text-white font-semibold px-8 py-3.5 rounded-xl transition-colors no-underline"
-              >
-                Gerar System Prompt
-              </Link>
-            </div>
+      <section className="relative pt-20 pb-0 overflow-hidden">
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, rgba(0, 49, 83, 0.2) 0%, transparent 70%)' }} />
+        <div className="max-w-7xl mx-auto px-4 text-center relative z-10">
+          <div className="inline-flex items-center gap-2 bg-brand-500/10 border border-brand-500/20 px-3 py-1 rounded-full text-xs text-brand-300 mb-8">
+            <span className="bg-brand-500 text-white px-1.5 py-0.5 rounded text-[10px] font-bold">v1.0</span>
+            <span>Framework para criacao de agentes de IA</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-tight">
+            Crie agentes de IA{' '}
+            <br />
+            com{' '}
+            <span className="font-serif italic text-brand-300">metodo</span>
+          </h1>
+
+          <p className="max-w-2xl mx-auto text-white/50 text-lg mb-10 leading-relaxed">
+            Framework de 7 fases para criar agentes conversacionais do zero ao go-live.
+            WhatsApp, Instagram, SMS, Web Chat.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <Link
+              to="/briefing"
+              className="w-full sm:w-auto bg-white text-surface-900 px-8 py-4 rounded-md font-semibold hover:bg-surface-100 transition-all text-center no-underline"
+            >
+              Criar Briefing com IA
+            </Link>
+            <Link
+              to="/onboarding"
+              className="w-full sm:w-auto text-white/70 font-medium hover:text-white transition-colors no-underline"
+            >
+              Onboarding Manual &rarr;
+            </Link>
+          </div>
+
+          {/* Trust badges */}
+          <div className="flex flex-wrap justify-center gap-8 text-white/40 text-xs font-medium uppercase tracking-widest mb-20">
+            <span>7 fases estruturadas</span>
+            <span>3 plataformas</span>
+            <span>5-15 dias ao go-live</span>
+            <span>10 cenarios de validacao</span>
           </div>
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="border-y border-surface-lighter bg-surface-light/30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { icon: <Zap className="text-primary-light" size={24} />, value: '7', label: 'Fases estruturadas' },
-              { icon: <Target className="text-accent" size={24} />, value: '3', label: 'Plataformas suportadas' },
-              { icon: <Clock className="text-emerald-400" size={24} />, value: '5-15d', label: 'Zero ao go-live' },
-              { icon: <span className="text-2xl">🧪</span>, value: '10', label: 'Cenarios de validacao' },
-            ].map((s, i) => (
-              <div key={i} className="text-center">
-                <div className="flex justify-center mb-2">{s.icon}</div>
-                <div className="text-2xl sm:text-3xl font-bold text-white">{s.value}</div>
-                <div className="text-sm text-slate-400">{s.label}</div>
+      {/* 7 Phases */}
+      <section className="py-24 border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <span className="text-brand-400 text-xs font-bold uppercase tracking-widest mb-4 block">Processo</span>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4">
+              As 7 fases do{' '}
+              <span className="font-serif italic text-white/50">CRIA</span>
+            </h2>
+            <p className="text-white/50 max-w-xl mx-auto">Cada fase produz um entregavel especifico. Sem pular etapas.</p>
+          </div>
+
+          <div className="space-y-3">
+            {phases.map((phase) => (
+              <div
+                key={phase.id}
+                className="p-6 rounded-2xl transition-all duration-300"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(0, 49, 83, 0.5)'
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)'
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'
+                }}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start gap-4">
+                  <div className="flex items-start gap-4 min-w-0 flex-1">
+                    <div className="w-10 h-10 rounded-xl bg-brand-500/20 border border-brand-400/30 flex items-center justify-center flex-shrink-0">
+                      <span className="text-brand-300 text-sm font-bold">{phase.id}</span>
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h3 className="text-lg font-bold text-white">{phase.name}</h3>
+                        <span className="text-xs text-white/30">{phase.time}</span>
+                      </div>
+                      <p className="text-sm text-white/50">{phase.description}</p>
+                    </div>
+                  </div>
+                  <div className="sm:ml-auto flex-shrink-0">
+                    <div className="text-xs text-white/30 mb-1">Entregavel</div>
+                    <div className="text-sm font-medium text-white/80 bg-white/5 rounded-lg px-3 py-1.5">
+                      {phase.deliverable}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 ml-14 flex flex-wrap gap-2">
+                  {phase.tasks.map((t, i) => (
+                    <span key={i} className="text-xs bg-white/5 text-white/40 rounded-full px-3 py-1">
+                      {t}
+                    </span>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 7 Phases */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">As 7 Fases do CRIA</h2>
-          <p className="text-slate-400">Cada fase produz um entregavel especifico — sem pular etapas</p>
-        </div>
-        <div className="space-y-4">
-          {phases.map((phase) => (
-            <div
-              key={phase.id}
-              className={`border rounded-xl p-5 sm:p-6 transition-all hover:scale-[1.01] ${colorMap[phase.color]}`}
-            >
-              <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-                <div className="flex items-center gap-3 min-w-0">
-                  <span className="text-3xl flex-shrink-0">{phase.icon}</span>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs font-bold opacity-60">FASE {phase.id}</span>
-                      <span className="text-xs opacity-40">•</span>
-                      <span className="text-xs opacity-60">{phase.time}</span>
-                    </div>
-                    <h3 className="text-lg font-bold text-white">{phase.name}</h3>
-                    <p className="text-sm opacity-80 mt-1">{phase.description}</p>
-                  </div>
-                </div>
-                <div className="sm:ml-auto flex-shrink-0">
-                  <div className="text-xs font-medium opacity-60 mb-1.5">Entregavel:</div>
-                  <div className="text-sm font-semibold text-white bg-white/5 rounded-lg px-3 py-1.5">
-                    {phase.deliverable}
-                  </div>
-                </div>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {phase.tasks.map((t, i) => (
-                  <span key={i} className="text-xs bg-white/5 rounded-full px-3 py-1 opacity-70">
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* Platform Comparison */}
-      <section className="bg-surface-light/30 border-y border-surface-lighter">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">Escolha a Plataforma Certa</h2>
-            <p className="text-slate-400">Use a ferramenta mais simples que resolve o problema</p>
+      <section className="py-24 border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <span className="text-brand-400 text-xs font-bold uppercase tracking-widest mb-4 block">Plataformas</span>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4">
+              Escolha a plataforma{' '}
+              <span className="font-serif italic text-white/50">certa</span>
+            </h2>
+            <p className="text-white/50">Use a ferramenta mais simples que resolve o problema</p>
           </div>
+
           <div className="grid md:grid-cols-3 gap-6">
             {platforms.map((p) => (
-              <div key={p.id} className={`border rounded-xl p-6 ${colorMap[p.color]} hover:scale-[1.02] transition-transform`}>
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-3xl">{p.icon}</span>
-                  <div>
-                    <h3 className="font-bold text-white text-lg">{p.name}</h3>
-                    <span className="text-xs font-medium opacity-60">{p.type}</span>
-                  </div>
+              <div
+                key={p.id}
+                className="p-8 rounded-2xl transition-all duration-300"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(0, 49, 83, 0.5)'
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)'
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'
+                }}
+              >
+                <div className="mb-6">
+                  <h3 className="font-bold text-white text-lg">{p.name}</h3>
+                  <span className="text-xs text-white/40">{p.type}</span>
                 </div>
                 <div className="space-y-3 text-sm">
-                  <div className="flex justify-between"><span className="opacity-60">Deploy</span><span className="text-white font-medium">{p.deployTime}</span></div>
-                  <div className="flex justify-between"><span className="opacity-60">Complexidade</span><span className="text-white font-medium">{p.complexity}</span></div>
-                  <div className="flex justify-between"><span className="opacity-60">Flexibilidade</span><span className="text-white font-medium">{p.flexibility}</span></div>
-                  <div className="flex justify-between"><span className="opacity-60">Multi-agent</span><span className="text-white font-medium">{p.multiAgent ? 'Sim' : 'Nao'}</span></div>
-                  <div className="flex justify-between"><span className="opacity-60">RAG/KB</span><span className="text-white font-medium">{p.rag}</span></div>
-                  <div className="flex justify-between"><span className="opacity-60">Gerenciado por</span><span className="text-white font-medium">{p.managedBy}</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">Deploy</span><span className="text-white font-medium">{p.deployTime}</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">Complexidade</span><span className="text-white font-medium">{p.complexity}</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">Flexibilidade</span><span className="text-white font-medium">{p.flexibility}</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">Multi-agent</span><span className="text-white font-medium">{p.multiAgent ? 'Sim' : 'Nao'}</span></div>
+                  <div className="flex justify-between"><span className="text-white/40">RAG/KB</span><span className="text-white font-medium">{p.rag}</span></div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <div className="text-xs font-medium opacity-60 mb-1">Melhor para:</div>
-                  <div className="text-sm text-white">{p.bestFor}</div>
+                <div className="mt-6 pt-6 border-t border-white/10">
+                  <div className="text-xs text-white/30 mb-1">Melhor para</div>
+                  <div className="text-sm text-white/70">{p.bestFor}</div>
                 </div>
               </div>
             ))}
@@ -151,37 +165,70 @@ export default function Home() {
       </section>
 
       {/* Metrics */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-3">Metricas de Sucesso</h2>
-          <p className="text-slate-400">O que monitorar apos o go-live</p>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {metrics.map((m, i) => (
-            <div key={i} className="bg-surface-light border border-surface-lighter rounded-xl p-5">
-              <div className="text-lg font-bold text-white mb-1">{m.name}</div>
-              <div className="text-sm text-slate-400 mb-3">{m.description}</div>
-              <div className="inline-block bg-accent/10 text-accent-light text-sm font-semibold px-3 py-1 rounded-lg">
-                Meta: {m.target}
+      <section className="py-24 border-t border-white/10">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <span className="text-brand-400 text-xs font-bold uppercase tracking-widest mb-4 block">Metricas</span>
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4">
+              O que monitorar apos o{' '}
+              <span className="font-serif italic text-white/50">go-live</span>
+            </h2>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {metrics.map((m, i) => (
+              <div
+                key={i}
+                className="p-6 rounded-2xl"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                }}
+              >
+                <div className="text-lg font-bold text-white mb-1">{m.name}</div>
+                <div className="text-sm text-white/40 mb-3">{m.description}</div>
+                <div className="text-sm font-semibold text-brand-300">
+                  Meta: {m.target}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
-        <div className="bg-gradient-to-r from-primary/20 to-accent/10 border border-primary/20 rounded-2xl p-8 sm:p-12 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Pronto para criar seu agente?</h2>
-          <p className="text-slate-300 mb-8 max-w-xl mx-auto">
-            Comece pelo onboarding — em 15 minutos voce tera o briefing completo do seu agente.
-          </p>
-          <Link
-            to="/onboarding"
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-semibold px-8 py-3.5 rounded-xl transition-colors no-underline"
+      {/* CTA Final */}
+      <section className="py-24">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div
+            className="p-12 md:p-16 rounded-3xl relative overflow-hidden"
+            style={{
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
           >
-            Comecar Onboarding <ArrowRight size={18} />
-          </Link>
+            <div className="absolute inset-0" style={{ background: 'radial-gradient(circle at center, rgba(0, 49, 83, 0.15) 0%, transparent 70%)' }} />
+            <div className="relative z-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                Pronto para criar seu agente?
+              </h2>
+              <p className="text-white/50 mb-8 max-w-lg mx-auto">
+                Comece pelo briefing com IA — em 15 minutos voce tera toda a documentacao do seu agente gerada automaticamente.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link
+                  to="/briefing"
+                  className="bg-white text-surface-900 px-8 py-4 rounded-md font-semibold hover:bg-surface-100 transition-all no-underline"
+                >
+                  Criar Briefing com IA
+                </Link>
+                <Link
+                  to="/prompt-generator"
+                  className="text-white/70 font-medium hover:text-white transition-colors no-underline"
+                >
+                  System Prompt Generator &rarr;
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
     </div>

@@ -1,27 +1,56 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #6366f1;
-  --color-primary-light: #818cf8;
-  --color-primary-dark: #4f46e5;
-  --color-accent: #06b6d4;
-  --color-accent-light: #22d3ee;
-  --color-surface: #0f172a;
-  --color-surface-light: #1e293b;
-  --color-surface-lighter: #334155;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --color-brand-50: #E6EDF3;
+  --color-brand-100: #B3C9DB;
+  --color-brand-200: #80A5C3;
+  --color-brand-300: #4D81AB;
+  --color-brand-400: #1A5D93;
+  --color-brand-500: #003153;
+  --color-brand-600: #002A47;
+  --color-brand-700: #00223B;
+  --color-brand-800: #001B2F;
+  --color-brand-900: #001323;
+
+  --color-surface-0: #FFFFFF;
+  --color-surface-50: #F5F5F2;
+  --color-surface-100: #ECE9E1;
+  --color-surface-200: #DDD8CE;
+  --color-surface-300: #C8C0B3;
+  --color-surface-400: #A29585;
+  --color-surface-500: #82766A;
+  --color-surface-600: #615444;
+  --color-surface-700: #4A3F32;
+  --color-surface-800: #2A2520;
+  --color-surface-900: #171717;
+  --color-surface-950: #0D0D0D;
+
+  --font-sans: 'Exo 2', 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-body {
-  margin: 0;
-  background-color: var(--color-surface);
-  color: #e2e8f0;
-  font-family: var(--font-sans);
-}
+@layer base {
+  body {
+    @apply bg-[#001323] text-white font-sans antialiased;
+  }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--color-surface); }
-::-webkit-scrollbar-thumb { background: var(--color-surface-lighter); border-radius: 3px; }
+  button, a, input, select, textarea {
+    transition: all 0.2s ease;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-white/20 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-white/30;
+  }
+}

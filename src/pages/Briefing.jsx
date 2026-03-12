@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Sparkles, Download, Copy, Check, FileText, Brain, BookOpen, GitBranch, Shield, Loader2 } from 'lucide-react'
 
 const STORAGE_KEY = 'cria-briefing-draft'
 
@@ -7,7 +6,6 @@ const steps = [
   {
     id: 1,
     title: 'Dados da Empresa',
-    icon: '🏢',
     description: 'Informacoes basicas sobre o negocio',
     fields: [
       { name: 'empresa', label: 'Nome da empresa', type: 'text', required: true },
@@ -22,7 +20,6 @@ const steps = [
   {
     id: 2,
     title: 'Canais e Objetivo',
-    icon: '🎯',
     description: 'Onde e para que o agente vai atuar',
     fields: [
       { name: 'canais', label: 'Canais do agente', type: 'multiselect', options: ['WhatsApp', 'Instagram DM', 'SMS', 'Web Chat', 'Facebook Messenger'], required: true },
@@ -36,7 +33,6 @@ const steps = [
   {
     id: 3,
     title: 'Persona do Agente',
-    icon: '🎭',
     description: 'Personalidade e tom de voz',
     fields: [
       { name: 'nome_agente', label: 'Nome do agente', type: 'text', placeholder: 'ex: Sofia, Ana, Lucas', required: true },
@@ -50,7 +46,6 @@ const steps = [
   {
     id: 4,
     title: 'Produtos e Servicos',
-    icon: '📦',
     description: 'O que o agente precisa conhecer',
     fields: [
       { name: 'produtos', label: 'Principais produtos/servicos', type: 'textarea', placeholder: 'Liste os produtos que o agente deve conhecer...', required: true },
@@ -64,7 +59,6 @@ const steps = [
   {
     id: 5,
     title: 'Qualificacao de Leads',
-    icon: '🏆',
     description: 'Como identificar e qualificar clientes',
     fields: [
       { name: 'dados_coletar', label: 'Dados a coletar do lead', type: 'text', placeholder: 'ex: nome, email, telefone, cidade', required: true },
@@ -77,7 +71,6 @@ const steps = [
   {
     id: 6,
     title: 'Escalacao e Regras',
-    icon: '🔄',
     description: 'Limites e transferencia para humano',
     fields: [
       { name: 'quando_escalar', label: 'Quando transferir para humano?', type: 'textarea', placeholder: 'ex: lead qualificado, reclamacao, pedido complexo', required: true },
@@ -92,7 +85,6 @@ const steps = [
   {
     id: 7,
     title: 'FAQ Principal',
-    icon: '❓',
     description: 'Perguntas e respostas mais comuns',
     fields: [
       ...Array.from({ length: 10 }, (_, i) => ({
@@ -113,31 +105,15 @@ const steps = [
   },
 ]
 
-const docIcons = {
-  'persona': FileText,
-  'system-prompt': Brain,
-  'knowledge-base': BookOpen,
-  'fluxo-conversacional': GitBranch,
-  'cenarios-validacao': Shield,
-}
-
-const docColors = {
-  'persona': 'text-purple-400',
-  'system-prompt': 'text-cyan-400',
-  'knowledge-base': 'text-yellow-400',
-  'fluxo-conversacional': 'text-emerald-400',
-  'cenarios-validacao': 'text-red-400',
-}
+const inputClass = 'w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-400 transition-colors text-sm'
 
 function FieldInput({ field, value, onChange }) {
-  const base = 'w-full bg-[#0f172a] border border-[#334155] rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-[#6366f1] focus:ring-1 focus:ring-[#6366f1]/30 transition-all'
-
   if (field.type === 'textarea') {
-    return <textarea className={`${base} min-h-[100px] resize-y`} value={value || ''} onChange={e => onChange(field.name, e.target.value)} placeholder={field.placeholder} />
+    return <textarea className={`${inputClass} min-h-[100px] resize-y`} value={value || ''} onChange={e => onChange(field.name, e.target.value)} placeholder={field.placeholder} />
   }
   if (field.type === 'select') {
     return (
-      <select className={base} value={value || ''} onChange={e => onChange(field.name, e.target.value)}>
+      <select className={inputClass} value={value || ''} onChange={e => onChange(field.name, e.target.value)}>
         <option value="">Selecione...</option>
         {field.options.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
@@ -154,10 +130,10 @@ function FieldInput({ field, value, onChange }) {
               const arr = value || []
               onChange(field.name, arr.includes(o) ? arr.filter(x => x !== o) : [...arr, o])
             }}
-            className={`px-4 py-2 rounded-xl text-sm font-medium border-2 transition-all ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
               (value || []).includes(o)
-                ? 'bg-[#6366f1]/20 border-[#6366f1] text-[#818cf8] shadow-lg shadow-[#6366f1]/10'
-                : 'bg-[#0f172a] border-[#334155] text-slate-400 hover:border-slate-400'
+                ? 'bg-brand-500/20 border-brand-400 text-white'
+                : 'bg-white/5 border-white/10 text-white/40 hover:border-white/30'
             }`}
           >
             {o}
@@ -166,50 +142,7 @@ function FieldInput({ field, value, onChange }) {
       </div>
     )
   }
-  return <input type={field.type || 'text'} className={base} value={value || ''} onChange={e => onChange(field.name, e.target.value)} placeholder={field.placeholder} />
-}
-
-function DocViewer({ doc }) {
-  const [copied, setCopied] = useState(false)
-  const Icon = docIcons[doc.id] || FileText
-  const color = docColors[doc.id] || 'text-slate-400'
-
-  const copy = () => {
-    navigator.clipboard.writeText(doc.content)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  const download = () => {
-    const blob = new Blob([doc.content], { type: 'text/markdown' })
-    const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
-    a.download = `${doc.id}.md`
-    a.click()
-  }
-
-  return (
-    <div className="bg-[#1e293b] border border-[#334155] rounded-2xl overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-[#334155]">
-        <div className="flex items-center gap-3">
-          <Icon size={20} className={color} />
-          <h3 className="font-semibold text-white">{doc.title}</h3>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={copy} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#334155] text-slate-300 hover:text-white transition-colors">
-            {copied ? <Check size={14} /> : <Copy size={14} />}
-            {copied ? 'Copiado!' : 'Copiar'}
-          </button>
-          <button onClick={download} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-[#6366f1]/20 text-[#818cf8] hover:bg-[#6366f1]/30 transition-colors">
-            <Download size={14} /> .md
-          </button>
-        </div>
-      </div>
-      <pre className="p-5 text-sm text-slate-300 whitespace-pre-wrap overflow-x-auto max-h-[500px] overflow-y-auto leading-relaxed">
-        {doc.content}
-      </pre>
-    </div>
-  )
+  return <input type={field.type || 'text'} className={inputClass} value={value || ''} onChange={e => onChange(field.name, e.target.value)} placeholder={field.placeholder} />
 }
 
 export default function Briefing() {
@@ -220,7 +153,6 @@ export default function Briefing() {
   const [error, setError] = useState(null)
   const [activeDoc, setActiveDoc] = useState(0)
 
-  // Load draft from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
@@ -228,7 +160,6 @@ export default function Briefing() {
     } catch {}
   }, [])
 
-  // Auto-save draft
   useEffect(() => {
     if (Object.keys(data).length > 0) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
@@ -254,7 +185,7 @@ export default function Briefing() {
     try {
       const API_URL = window.location.hostname === 'localhost'
         ? '/api/generate'
-        : 'https://cria-production.up.railway.app/api/generate'
+        : `${window.location.origin}/api/generate`
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -288,6 +219,18 @@ export default function Briefing() {
     a.click()
   }
 
+  const copyDoc = (content) => {
+    navigator.clipboard.writeText(content)
+  }
+
+  const downloadDoc = (doc) => {
+    const blob = new Blob([doc.content], { type: 'text/markdown' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `${doc.id}.md`
+    a.click()
+  }
+
   const resetAll = () => {
     localStorage.removeItem(STORAGE_KEY)
     setData({})
@@ -298,54 +241,62 @@ export default function Briefing() {
   // Results screen
   if (result) {
     return (
-      <div className="min-h-screen bg-[#0f172a] text-slate-200">
+      <div className="min-h-screen bg-[#001323] text-white font-['Exo_2',sans-serif]">
         <div className="max-w-5xl mx-auto px-4 py-8">
-          {/* Header */}
           <div className="text-center mb-10">
-            <div className="text-5xl mb-4">🧬</div>
-            <h1 className="text-3xl font-bold text-white mb-2">Documentacao Gerada!</h1>
-            <p className="text-slate-400">
-              {result.docs.length} documentos criados para <span className="text-[#818cf8] font-semibold">{result.empresa}</span>
+            <span className="text-brand-400 text-xs font-bold uppercase tracking-widest mb-4 block">Resultado</span>
+            <h1 className="text-3xl font-bold text-white mb-2">Documentacao gerada</h1>
+            <p className="text-white/50">
+              {result.docs.length} documentos criados para <span className="text-white font-semibold">{result.empresa}</span>
             </p>
           </div>
 
           {/* Doc tabs */}
           <div className="flex flex-wrap gap-2 mb-6">
-            {result.docs.map((doc, i) => {
-              const Icon = docIcons[doc.id] || FileText
-              const color = docColors[doc.id] || 'text-slate-400'
-              return (
-                <button
-                  key={doc.id}
-                  onClick={() => setActiveDoc(i)}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                    activeDoc === i
-                      ? 'bg-[#1e293b] border-2 border-[#6366f1] text-white shadow-lg shadow-[#6366f1]/10'
-                      : 'bg-[#1e293b]/50 border-2 border-transparent text-slate-400 hover:text-white hover:border-[#334155]'
-                  }`}
-                >
-                  <Icon size={16} className={color} />
-                  {doc.title}
-                </button>
-              )
-            })}
+            {result.docs.map((doc, i) => (
+              <button
+                key={doc.id}
+                onClick={() => setActiveDoc(i)}
+                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  activeDoc === i
+                    ? 'bg-white/10 border border-white/20 text-white'
+                    : 'bg-white/3 border border-transparent text-white/40 hover:text-white hover:border-white/10'
+                }`}
+              >
+                {doc.title}
+              </button>
+            ))}
           </div>
 
           {/* Active doc */}
-          <DocViewer doc={result.docs[activeDoc]} />
+          <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+              <h3 className="font-semibold text-white">{result.docs[activeDoc]?.title}</h3>
+              <div className="flex gap-2">
+                <button onClick={() => copyDoc(result.docs[activeDoc]?.content)} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition-colors">
+                  Copiar
+                </button>
+                <button onClick={() => downloadDoc(result.docs[activeDoc])} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-brand-500/20 text-brand-300 hover:bg-brand-500/30 transition-colors">
+                  Download .md
+                </button>
+              </div>
+            </div>
+            <pre className="p-5 text-sm text-white/70 whitespace-pre-wrap overflow-x-auto max-h-[500px] overflow-y-auto leading-relaxed">
+              {result.docs[activeDoc]?.content}
+            </pre>
+          </div>
 
           {/* Actions */}
           <div className="flex flex-wrap gap-3 mt-8 justify-center">
-            <button onClick={downloadAll} className="flex items-center gap-2 bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold px-6 py-3 rounded-xl transition-colors">
-              <Download size={18} /> Baixar Tudo (.md)
+            <button onClick={downloadAll} className="bg-white text-surface-900 font-semibold px-6 py-3 rounded-md hover:bg-surface-100 transition-colors">
+              Baixar Tudo (.md)
             </button>
-            <button onClick={resetAll} className="flex items-center gap-2 bg-[#334155] hover:bg-[#475569] text-white font-semibold px-6 py-3 rounded-xl transition-colors">
+            <button onClick={resetAll} className="bg-white/10 text-white font-semibold px-6 py-3 rounded-md hover:bg-white/15 transition-colors">
               Novo Briefing
             </button>
           </div>
 
-          {/* Footer */}
-          <div className="text-center mt-12 text-sm text-slate-500">
+          <div className="text-center mt-12 text-sm text-white/30">
             Metodo CRIA — Triadeflow &copy; {new Date().getFullYear()}
           </div>
         </div>
@@ -362,28 +313,29 @@ export default function Briefing() {
     : null
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-slate-200">
+    <div className="min-h-screen bg-[#001323] text-white font-['Exo_2',sans-serif]">
       {/* Header bar */}
-      <header className="border-b border-[#1e293b] bg-[#0f172a]/90 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b border-white/10 bg-[#001323]/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">🧬</span>
+            <div className="w-7 h-7 bg-brand-500 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-[10px]">C</span>
+            </div>
             <span className="font-bold text-lg text-white">CRIA</span>
-            <span className="text-xs text-[#818cf8] bg-[#6366f1]/20 px-2 py-0.5 rounded-full">Briefing</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest">Briefing</span>
           </div>
-          <div className="text-sm text-slate-500">
-            {filledCount}/7 etapas completas
+          <div className="text-sm text-white/30">
+            {filledCount}/7 etapas
           </div>
         </div>
       </header>
 
       <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* Welcome message on first step with no data */}
+        {/* Welcome message */}
         {currentStep === 0 && Object.keys(data).length === 0 && (
           <div className="text-center mb-10 py-6">
-            <div className="text-6xl mb-4">🧬</div>
             <h1 className="text-3xl font-bold text-white mb-3">Briefing do Agente de IA</h1>
-            <p className="text-slate-400 max-w-md mx-auto leading-relaxed">
+            <p className="text-white/50 max-w-md mx-auto leading-relaxed">
               Preencha as 7 etapas abaixo e nossa IA vai gerar toda a documentacao necessaria para criar seu agente.
             </p>
           </div>
@@ -395,8 +347,8 @@ export default function Briefing() {
             <button
               key={s.id}
               onClick={() => setCurrentStep(i)}
-              className={`flex-1 h-2.5 rounded-full transition-all cursor-pointer ${
-                i < currentStep ? 'bg-[#10b981]' : i === currentStep ? 'bg-[#6366f1] shadow-lg shadow-[#6366f1]/30' : 'bg-[#1e293b]'
+              className={`flex-1 h-1.5 rounded-full transition-all cursor-pointer ${
+                i < currentStep ? 'bg-brand-400' : i === currentStep ? 'bg-white' : 'bg-white/10'
               }`}
               title={s.title}
             />
@@ -404,29 +356,26 @@ export default function Briefing() {
         </div>
 
         {/* Step header */}
-        <div className="flex items-center gap-4 mb-2">
-          <div className="text-4xl">{step.icon}</div>
-          <div>
-            <div className="text-xs text-slate-500 font-semibold tracking-wider uppercase">
-              Etapa {step.id} de {steps.length}
-            </div>
-            <h2 className="text-2xl font-bold text-white">{step.title}</h2>
-            <p className="text-sm text-slate-400 mt-0.5">{step.description}</p>
+        <div className="mb-8">
+          <div className="text-xs text-white/30 font-medium uppercase tracking-wider mb-1">
+            Etapa {step.id} de {steps.length}
           </div>
+          <h2 className="text-2xl font-bold text-white">{step.title}</h2>
+          <p className="text-sm text-white/40 mt-1">{step.description}</p>
         </div>
 
         {/* Fields */}
-        <div className="space-y-5 mt-8">
+        <div className="space-y-5">
           {faqFields ? (
             faqFields.map(({ question, answer }) => (
-              <div key={question.name} className="bg-[#1e293b] border border-[#334155] rounded-2xl p-5 space-y-3">
+              <div key={question.name} className="rounded-xl p-5 space-y-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">{question.label}</label>
+                  <label className="block text-sm font-medium text-white/70 mb-2">{question.label}</label>
                   <FieldInput field={question} value={data[question.name]} onChange={onChange} />
                 </div>
                 {answer && data[question.name] && (
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">{answer.label}</label>
+                    <label className="block text-sm font-medium text-white/70 mb-2">{answer.label}</label>
                     <FieldInput field={{ ...answer, hidden: false }} value={data[answer.name]} onChange={onChange} />
                   </div>
                 )}
@@ -435,8 +384,8 @@ export default function Briefing() {
           ) : (
             step.fields.filter(f => !f.hidden).map(f => (
               <div key={f.name}>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  {f.label} {f.required && <span className="text-red-400">*</span>}
+                <label className="block text-sm font-medium text-white/70 mb-2">
+                  {f.label} {f.required && <span className="text-brand-300">*</span>}
                 </label>
                 <FieldInput field={f} value={data[f.name]} onChange={onChange} />
               </div>
@@ -449,39 +398,31 @@ export default function Briefing() {
           <button
             onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
             disabled={currentStep === 0}
-            className="flex items-center gap-2 text-slate-400 hover:text-white disabled:opacity-30 transition-colors font-medium"
+            className="text-white/40 hover:text-white disabled:opacity-30 transition-colors font-medium"
           >
-            <ChevronLeft size={18} /> Anterior
+            &larr; Anterior
           </button>
 
           {currentStep < steps.length - 1 ? (
             <button
               onClick={() => setCurrentStep(currentStep + 1)}
-              className="flex items-center gap-2 bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold px-6 py-3 rounded-xl transition-colors shadow-lg shadow-[#6366f1]/20"
+              className="bg-white text-surface-900 font-semibold px-6 py-3 rounded-md hover:bg-surface-100 transition-colors"
             >
-              Proximo <ChevronRight size={18} />
+              Proximo &rarr;
             </button>
           ) : (
             <button
               onClick={handleGenerate}
               disabled={generating}
-              className="flex items-center gap-2 bg-gradient-to-r from-[#6366f1] to-[#06b6d4] hover:from-[#4f46e5] hover:to-[#0891b2] text-white font-semibold px-8 py-3 rounded-xl transition-all shadow-lg shadow-[#6366f1]/20 disabled:opacity-60"
+              className="bg-white text-surface-900 font-semibold px-8 py-3 rounded-md hover:bg-surface-100 transition-colors disabled:opacity-60"
             >
-              {generating ? (
-                <>
-                  <Loader2 size={18} className="animate-spin" /> Gerando documentos...
-                </>
-              ) : (
-                <>
-                  <Sparkles size={18} /> Gerar com IA
-                </>
-              )}
+              {generating ? 'Gerando documentos...' : 'Gerar com IA'}
             </button>
           )}
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl px-5 py-4 mb-6">
+          <div className="bg-white/5 border border-white/10 text-white/70 rounded-xl px-5 py-4 mb-6">
             {error}
           </div>
         )}

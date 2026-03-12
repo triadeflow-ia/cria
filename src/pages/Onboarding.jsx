@@ -1,11 +1,9 @@
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, Download, CheckCircle } from 'lucide-react'
 
 const steps = [
   {
     id: 1,
     title: 'Dados da Empresa',
-    icon: '🏢',
     fields: [
       { name: 'empresa', label: 'Nome da empresa', type: 'text', required: true },
       { name: 'nicho', label: 'Nicho/Segmento', type: 'text', placeholder: 'ex: saude, delivery, educacao', required: true },
@@ -19,7 +17,6 @@ const steps = [
   {
     id: 2,
     title: 'Canais e Objetivo',
-    icon: '🎯',
     fields: [
       { name: 'canais', label: 'Canais do agente', type: 'multiselect', options: ['WhatsApp', 'Instagram DM', 'SMS', 'Web Chat', 'Facebook Messenger'], required: true },
       { name: 'objetivo', label: 'Objetivo principal', type: 'select', options: ['Vendas', 'Suporte', 'Agendamento', 'Qualificacao de leads', 'Misto'], required: true },
@@ -32,7 +29,6 @@ const steps = [
   {
     id: 3,
     title: 'Persona do Agente',
-    icon: '🎭',
     fields: [
       { name: 'nome_agente', label: 'Nome do agente', type: 'text', placeholder: 'ex: Sofia, Ana, Lucas', required: true },
       { name: 'genero', label: 'Genero', type: 'select', options: ['Feminino', 'Masculino', 'Neutro'] },
@@ -45,7 +41,6 @@ const steps = [
   {
     id: 4,
     title: 'Produtos e Servicos',
-    icon: '📦',
     fields: [
       { name: 'produtos', label: 'Principais produtos/servicos', type: 'textarea', placeholder: 'Liste os produtos que o agente deve conhecer...', required: true },
       { name: 'precos', label: 'Tabela de precos (faixas ou valores)', type: 'textarea', placeholder: 'ex: Plano Basic R$97/mes, Plano Pro R$197/mes' },
@@ -58,7 +53,6 @@ const steps = [
   {
     id: 5,
     title: 'Qualificacao',
-    icon: '🏆',
     fields: [
       { name: 'dados_coletar', label: 'Dados a coletar do lead', type: 'text', placeholder: 'ex: nome, email, telefone, cidade', required: true },
       { name: 'perguntas_qualificacao', label: 'Perguntas de qualificacao (max 5-6)', type: 'textarea', placeholder: 'Liste as perguntas que o agente deve fazer...', required: true },
@@ -70,7 +64,6 @@ const steps = [
   {
     id: 6,
     title: 'Escalacao e Regras',
-    icon: '🔄',
     fields: [
       { name: 'quando_escalar', label: 'Quando transferir para humano?', type: 'textarea', placeholder: 'ex: lead qualificado, reclamacao, pedido complexo', required: true },
       { name: 'escalar_para', label: 'Para quem transferir?', type: 'text', placeholder: 'Nome/setor/numero', required: true },
@@ -84,7 +77,6 @@ const steps = [
   {
     id: 7,
     title: 'FAQ Principal',
-    icon: '❓',
     fields: [
       ...Array.from({ length: 10 }, (_, i) => ({
         name: `faq_pergunta_${i + 1}`,
@@ -104,15 +96,15 @@ const steps = [
   },
 ]
 
-function FieldInput({ field, value, onChange }) {
-  const base = 'w-full bg-surface border border-surface-lighter rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-colors'
+const inputClass = 'w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-brand-400 transition-colors text-sm'
 
+function FieldInput({ field, value, onChange }) {
   if (field.type === 'textarea') {
-    return <textarea className={`${base} min-h-[80px] resize-y`} value={value || ''} onChange={e => onChange(field.name, e.target.value)} placeholder={field.placeholder} />
+    return <textarea className={`${inputClass} min-h-[80px] resize-y`} value={value || ''} onChange={e => onChange(field.name, e.target.value)} placeholder={field.placeholder} />
   }
   if (field.type === 'select') {
     return (
-      <select className={base} value={value || ''} onChange={e => onChange(field.name, e.target.value)}>
+      <select className={inputClass} value={value || ''} onChange={e => onChange(field.name, e.target.value)}>
         <option value="">Selecione...</option>
         {field.options.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
@@ -131,8 +123,8 @@ function FieldInput({ field, value, onChange }) {
             }}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${
               (value || []).includes(o)
-                ? 'bg-primary/20 border-primary text-primary-light'
-                : 'bg-surface border-surface-lighter text-slate-400 hover:border-slate-500'
+                ? 'bg-brand-500/20 border-brand-400 text-white'
+                : 'bg-white/5 border-white/10 text-white/40 hover:border-white/30'
             }`}
           >
             {o}
@@ -141,7 +133,7 @@ function FieldInput({ field, value, onChange }) {
       </div>
     )
   }
-  return <input type={field.type || 'text'} className={base} value={value || ''} onChange={e => onChange(field.name, e.target.value)} placeholder={field.placeholder} />
+  return <input type={field.type || 'text'} className={inputClass} value={value || ''} onChange={e => onChange(field.name, e.target.value)} placeholder={field.placeholder} />
 }
 
 export default function Onboarding() {
@@ -150,14 +142,13 @@ export default function Onboarding() {
   const [complete, setComplete] = useState(false)
 
   const step = steps[currentStep]
-
   const onChange = (name, value) => setData(prev => ({ ...prev, [name]: value }))
 
   const exportData = () => {
     let md = `# Briefing CRIA — ${data.empresa || 'Projeto'}\n\n`
     md += `**Data:** ${new Date().toISOString().split('T')[0]}\n\n---\n\n`
     steps.forEach(s => {
-      md += `## ${s.icon} ${s.title}\n\n`
+      md += `## ${s.title}\n\n`
       s.fields.filter(f => !f.hidden).forEach(f => {
         const val = data[f.name]
         if (val) {
@@ -177,14 +168,13 @@ export default function Onboarding() {
   if (complete) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-        <div className="text-6xl mb-6">✅</div>
-        <h1 className="text-3xl font-bold text-white mb-4">Briefing Completo!</h1>
-        <p className="text-slate-400 mb-8">Todas as informacoes foram coletadas. Exporte o briefing para iniciar a criacao do agente.</p>
+        <h1 className="text-3xl font-bold text-white mb-4">Briefing completo</h1>
+        <p className="text-white/50 mb-8">Todas as informacoes foram coletadas. Exporte o briefing para iniciar a criacao do agente.</p>
         <div className="flex gap-4 justify-center">
-          <button onClick={exportData} className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-3 rounded-xl transition-colors">
-            <Download size={18} /> Exportar Briefing (.md)
+          <button onClick={exportData} className="bg-white text-surface-900 font-semibold px-6 py-3 rounded-md hover:bg-surface-100 transition-colors">
+            Exportar Briefing (.md)
           </button>
-          <button onClick={() => { setComplete(false); setCurrentStep(0) }} className="bg-surface-lighter hover:bg-surface-lighter/80 text-white font-semibold px-6 py-3 rounded-xl transition-colors">
+          <button onClick={() => { setComplete(false); setCurrentStep(0) }} className="bg-white/10 text-white font-semibold px-6 py-3 rounded-md hover:bg-white/15 transition-colors">
             Recomecar
           </button>
         </div>
@@ -204,38 +194,34 @@ export default function Onboarding() {
       {/* Progress */}
       <div className="flex items-center gap-1 mb-8">
         {steps.map((s, i) => (
-          <div key={s.id} className="flex-1 flex items-center gap-1">
-            <button
-              onClick={() => setCurrentStep(i)}
-              className={`flex-1 h-2 rounded-full transition-colors ${
-                i < currentStep ? 'bg-success' : i === currentStep ? 'bg-primary' : 'bg-surface-lighter'
-              }`}
-            />
-          </div>
+          <button
+            key={s.id}
+            onClick={() => setCurrentStep(i)}
+            className={`flex-1 h-1.5 rounded-full transition-colors ${
+              i < currentStep ? 'bg-brand-400' : i === currentStep ? 'bg-white' : 'bg-white/10'
+            }`}
+          />
         ))}
       </div>
 
       {/* Step Header */}
-      <div className="flex items-center gap-3 mb-2">
-        <span className="text-3xl">{step.icon}</span>
-        <div>
-          <div className="text-xs text-slate-500 font-medium">PASSO {step.id} DE {steps.length}</div>
-          <h1 className="text-2xl font-bold text-white">{step.title}</h1>
-        </div>
+      <div className="mb-8">
+        <div className="text-xs text-white/30 font-medium uppercase tracking-wider mb-1">Passo {step.id} de {steps.length}</div>
+        <h1 className="text-2xl font-bold text-white">{step.title}</h1>
       </div>
 
       {/* Fields */}
-      <div className="space-y-5 mt-8">
+      <div className="space-y-5">
         {faqFields ? (
           faqFields.map(({ question, answer }) => (
-            <div key={question.name} className="bg-surface-light border border-surface-lighter rounded-xl p-4 space-y-3">
+            <div key={question.name} className="rounded-xl p-4 space-y-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">{question.label}</label>
+                <label className="block text-sm font-medium text-white/70 mb-1.5">{question.label}</label>
                 <FieldInput field={question} value={data[question.name]} onChange={onChange} />
               </div>
               {answer && data[question.name] && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1.5">{answer.label}</label>
+                  <label className="block text-sm font-medium text-white/70 mb-1.5">{answer.label}</label>
                   <FieldInput field={{ ...answer, hidden: false }} value={data[answer.name]} onChange={onChange} />
                 </div>
               )}
@@ -244,8 +230,8 @@ export default function Onboarding() {
         ) : (
           step.fields.filter(f => !f.hidden).map(f => (
             <div key={f.name}>
-              <label className="block text-sm font-medium text-slate-300 mb-1.5">
-                {f.label} {f.required && <span className="text-danger">*</span>}
+              <label className="block text-sm font-medium text-white/70 mb-1.5">
+                {f.label} {f.required && <span className="text-brand-300">*</span>}
               </label>
               <FieldInput field={f} value={data[f.name]} onChange={onChange} />
             </div>
@@ -258,23 +244,23 @@ export default function Onboarding() {
         <button
           onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
           disabled={currentStep === 0}
-          className="inline-flex items-center gap-2 text-slate-400 hover:text-white disabled:opacity-30 transition-colors font-medium"
+          className="text-white/40 hover:text-white disabled:opacity-30 transition-colors font-medium"
         >
-          <ChevronLeft size={18} /> Anterior
+          &larr; Anterior
         </button>
         {currentStep < steps.length - 1 ? (
           <button
             onClick={() => setCurrentStep(currentStep + 1)}
-            className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-xl transition-colors"
+            className="bg-white text-surface-900 font-semibold px-6 py-2.5 rounded-md hover:bg-surface-100 transition-colors"
           >
-            Proximo <ChevronRight size={18} />
+            Proximo &rarr;
           </button>
         ) : (
           <button
             onClick={() => setComplete(true)}
-            className="inline-flex items-center gap-2 bg-success hover:bg-success/80 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors"
+            className="bg-white text-surface-900 font-semibold px-6 py-2.5 rounded-md hover:bg-surface-100 transition-colors"
           >
-            <CheckCircle size={18} /> Finalizar
+            Finalizar
           </button>
         )}
       </div>

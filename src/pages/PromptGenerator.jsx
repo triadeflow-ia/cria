@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Copy, Check, RotateCcw } from 'lucide-react'
 
 const defaultState = {
   nome_agente: '',
@@ -20,6 +19,8 @@ const defaultState = {
   msg_transicao: '',
   regras_extras: '',
 }
+
+const inputClass = 'w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-white/30 focus:outline-none focus:border-brand-400 transition-colors text-sm'
 
 export default function PromptGenerator() {
   const [form, setForm] = useState(defaultState)
@@ -69,68 +70,65 @@ Mensagem de transicao: "${form.msg_transicao || `Vou te conectar com ${form.esca
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const inputClass = 'w-full bg-surface border border-surface-lighter rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-primary transition-colors text-sm'
-  const selectClass = inputClass
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-10">
       <div className="text-center mb-10">
-        <span className="text-4xl">🧠</span>
-        <h1 className="text-3xl font-bold text-white mt-3 mb-2">System Prompt Generator</h1>
-        <p className="text-slate-400">Preencha os campos e gere o system prompt pronto para usar</p>
+        <span className="text-brand-400 text-xs font-bold uppercase tracking-widest mb-4 block">Ferramenta</span>
+        <h1 className="text-3xl font-bold text-white mb-2">System Prompt Generator</h1>
+        <p className="text-white/50">Preencha os campos e gere o system prompt pronto para usar</p>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Form */}
         <div className="space-y-6">
           {/* Identity */}
-          <div className="bg-surface-light border border-surface-lighter rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-primary-light mb-4">🎭 Identidade</h3>
+          <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <h3 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wider">Identidade</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Nome do agente *</label>
+                <label className="block text-xs font-medium text-white/40 mb-1">Nome do agente *</label>
                 <input className={inputClass} value={form.nome_agente} onChange={e => set('nome_agente', e.target.value)} placeholder="ex: Sofia" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Papel *</label>
+                <label className="block text-xs font-medium text-white/40 mb-1">Papel *</label>
                 <input className={inputClass} value={form.papel} onChange={e => set('papel', e.target.value)} placeholder="ex: assistente de vendas" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Empresa *</label>
+                <label className="block text-xs font-medium text-white/40 mb-1">Empresa *</label>
                 <input className={inputClass} value={form.empresa} onChange={e => set('empresa', e.target.value)} placeholder="Nome da empresa" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Objetivo principal *</label>
-                <input className={inputClass} value={form.objetivo} onChange={e => set('objetivo', e.target.value)} placeholder="ex: Qualificar leads e agendar consultas" />
+                <label className="block text-xs font-medium text-white/40 mb-1">Objetivo principal *</label>
+                <input className={inputClass} value={form.objetivo} onChange={e => set('objetivo', e.target.value)} placeholder="ex: Qualificar leads" />
               </div>
             </div>
           </div>
 
           {/* Tone */}
-          <div className="bg-surface-light border border-surface-lighter rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-primary-light mb-4">🗣️ Tom de Voz</h3>
+          <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <h3 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wider">Tom de Voz</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Tom</label>
-                <select className={selectClass} value={form.tom} onChange={e => set('tom', e.target.value)}>
+                <label className="block text-xs font-medium text-white/40 mb-1">Tom</label>
+                <select className={inputClass} value={form.tom} onChange={e => set('tom', e.target.value)}>
                   {['Formal', 'Semi-formal', 'Informal', 'Consultivo', 'Amigavel'].map(o => <option key={o}>{o}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Tratamento</label>
-                <select className={selectClass} value={form.tratamento} onChange={e => set('tratamento', e.target.value)}>
+                <label className="block text-xs font-medium text-white/40 mb-1">Tratamento</label>
+                <select className={inputClass} value={form.tratamento} onChange={e => set('tratamento', e.target.value)}>
                   {['Voce', 'Senhor(a)', 'Tu'].map(o => <option key={o}>{o}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Emojis</label>
-                <select className={selectClass} value={form.emojis} onChange={e => set('emojis', e.target.value)}>
+                <label className="block text-xs font-medium text-white/40 mb-1">Emojis</label>
+                <select className={inputClass} value={form.emojis} onChange={e => set('emojis', e.target.value)}>
                   {['Nunca', 'Pouco', 'Moderado', 'Bastante'].map(o => <option key={o}>{o}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Comprimento de resposta</label>
-                <select className={selectClass} value={form.comprimento} onChange={e => set('comprimento', e.target.value)}>
+                <label className="block text-xs font-medium text-white/40 mb-1">Comprimento</label>
+                <select className={inputClass} value={form.comprimento} onChange={e => set('comprimento', e.target.value)}>
                   {['Curto (1-2 frases)', 'Medio (3-4 frases)', 'Detalhado'].map(o => <option key={o}>{o}</option>)}
                 </select>
               </div>
@@ -138,24 +136,24 @@ Mensagem de transicao: "${form.msg_transicao || `Vou te conectar com ${form.esca
           </div>
 
           {/* Business */}
-          <div className="bg-surface-light border border-surface-lighter rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-primary-light mb-4">📦 Negocio</h3>
+          <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <h3 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wider">Negocio</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Produtos/Servicos</label>
+                <label className="block text-xs font-medium text-white/40 mb-1">Produtos/Servicos</label>
                 <textarea className={`${inputClass} min-h-[60px]`} value={form.produtos} onChange={e => set('produtos', e.target.value)} placeholder="Liste os produtos..." />
               </div>
               <div className="grid sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Precos</label>
+                  <label className="block text-xs font-medium text-white/40 mb-1">Precos</label>
                   <input className={inputClass} value={form.precos} onChange={e => set('precos', e.target.value)} placeholder="Faixas ou valores" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Horario</label>
+                  <label className="block text-xs font-medium text-white/40 mb-1">Horario</label>
                   <input className={inputClass} value={form.horario} onChange={e => set('horario', e.target.value)} placeholder="seg-sex 9h-18h" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Localizacao</label>
+                  <label className="block text-xs font-medium text-white/40 mb-1">Localizacao</label>
                   <input className={inputClass} value={form.localizacao} onChange={e => set('localizacao', e.target.value)} placeholder="Cidade/Estado" />
                 </div>
               </div>
@@ -163,29 +161,29 @@ Mensagem de transicao: "${form.msg_transicao || `Vou te conectar com ${form.esca
           </div>
 
           {/* Qualification */}
-          <div className="bg-surface-light border border-surface-lighter rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-primary-light mb-4">🎯 Qualificacao</h3>
+          <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <h3 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wider">Qualificacao</h3>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">Perguntas de qualificacao (uma por linha)</label>
+              <label className="block text-xs font-medium text-white/40 mb-1">Perguntas de qualificacao (uma por linha)</label>
               <textarea className={`${inputClass} min-h-[100px]`} value={form.perguntas} onChange={e => set('perguntas', e.target.value)} placeholder="Qual seu interesse?&#10;Qual sua cidade?&#10;Qual seu orcamento?" />
             </div>
           </div>
 
           {/* Escalation */}
-          <div className="bg-surface-light border border-surface-lighter rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-primary-light mb-4">🔄 Escalacao</h3>
+          <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <h3 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wider">Escalacao</h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Quando escalar (uma razao por linha)</label>
+                <label className="block text-xs font-medium text-white/40 mb-1">Quando escalar (uma razao por linha)</label>
                 <textarea className={`${inputClass} min-h-[80px]`} value={form.escalar_quando} onChange={e => set('escalar_quando', e.target.value)} placeholder="Cliente pede humano&#10;Reclamacao&#10;Lead qualificado" />
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Para quem</label>
+                  <label className="block text-xs font-medium text-white/40 mb-1">Para quem</label>
                   <input className={inputClass} value={form.escalar_para} onChange={e => set('escalar_para', e.target.value)} placeholder="ex: equipe comercial" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Mensagem de transicao</label>
+                  <label className="block text-xs font-medium text-white/40 mb-1">Mensagem de transicao</label>
                   <input className={inputClass} value={form.msg_transicao} onChange={e => set('msg_transicao', e.target.value)} placeholder="Vou te conectar com..." />
                 </div>
               </div>
@@ -193,27 +191,27 @@ Mensagem de transicao: "${form.msg_transicao || `Vou te conectar com ${form.esca
           </div>
 
           {/* Extra Rules */}
-          <div className="bg-surface-light border border-surface-lighter rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-primary-light mb-4">⚠️ Regras Extras</h3>
-            <textarea className={`${inputClass} min-h-[80px]`} value={form.regras_extras} onChange={e => set('regras_extras', e.target.value)} placeholder="Uma regra por linha...&#10;ex: Nunca mencionar produto X&#10;Sempre oferecer produto Y primeiro" />
+          <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <h3 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wider">Regras Extras</h3>
+            <textarea className={`${inputClass} min-h-[80px]`} value={form.regras_extras} onChange={e => set('regras_extras', e.target.value)} placeholder="Uma regra por linha..." />
           </div>
         </div>
 
         {/* Preview */}
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <div className="bg-surface-light border border-surface-lighter rounded-xl overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-3 border-b border-surface-lighter">
+          <div className="rounded-xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
               <h3 className="text-sm font-semibold text-white">System Prompt</h3>
               <div className="flex gap-2">
-                <button onClick={() => setForm(defaultState)} className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-surface-lighter transition-colors" title="Limpar">
-                  <RotateCcw size={16} />
+                <button onClick={() => setForm(defaultState)} className="text-white/40 hover:text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors">
+                  Limpar
                 </button>
-                <button onClick={copy} className="inline-flex items-center gap-1.5 text-sm font-medium bg-primary/20 text-primary-light hover:bg-primary/30 px-3 py-1.5 rounded-lg transition-colors">
-                  {copied ? <><Check size={14} /> Copiado!</> : <><Copy size={14} /> Copiar</>}
+                <button onClick={copy} className="text-sm font-medium bg-white text-surface-900 hover:bg-surface-100 px-4 py-1.5 rounded-lg transition-colors">
+                  {copied ? 'Copiado!' : 'Copiar'}
                 </button>
               </div>
             </div>
-            <pre className="p-5 text-sm text-slate-300 whitespace-pre-wrap max-h-[75vh] overflow-y-auto leading-relaxed font-mono">
+            <pre className="p-5 text-sm text-white/70 whitespace-pre-wrap max-h-[75vh] overflow-y-auto leading-relaxed font-mono">
               {prompt}
             </pre>
           </div>

@@ -1,50 +1,57 @@
-import { Outlet, Link, useLocation } from 'react-router-dom'
-import { Home, FileText, Cpu, CheckCircle } from 'lucide-react'
+import { Outlet, NavLink, Link } from 'react-router-dom'
 
 const navItems = [
-  { path: '/', label: 'Metodo', icon: Home },
-  { path: '/onboarding', label: 'Onboarding', icon: FileText },
-  { path: '/prompt-generator', label: 'Prompt Generator', icon: Cpu },
-  { path: '/validation', label: 'Validacao', icon: CheckCircle },
+  { path: '/', label: 'Metodo' },
+  { path: '/onboarding', label: 'Onboarding' },
+  { path: '/prompt-generator', label: 'Prompt Generator' },
+  { path: '/validation', label: 'Validacao' },
 ]
 
 export default function Layout() {
-  const { pathname } = useLocation()
-
   return (
     <div className="min-h-screen flex flex-col">
-      <header className="border-b border-surface-lighter bg-surface-light/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-2 text-white no-underline">
-              <span className="text-2xl">🧬</span>
-              <span className="font-bold text-lg">Metodo CRIA</span>
-              <span className="text-xs text-primary-light bg-primary/20 px-2 py-0.5 rounded-full ml-2">v1.0</span>
-            </Link>
-            <nav className="flex items-center gap-1">
-              {navItems.map(({ path, label, icon: Icon }) => (
-                <Link
-                  key={path}
-                  to={path}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors no-underline ${
-                    pathname === path
-                      ? 'bg-primary/20 text-primary-light'
-                      : 'text-slate-400 hover:text-white hover:bg-surface-lighter/50'
-                  }`}
-                >
-                  <Icon size={16} />
-                  <span className="hidden sm:inline">{label}</span>
-                </Link>
-              ))}
-            </nav>
-          </div>
+      <header className="fixed top-0 w-full z-50 border-b border-white/10 bg-[#001323]/80 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2 no-underline">
+            <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-xs">C</span>
+            </div>
+            <span className="text-lg font-semibold tracking-tight text-white">CRIA</span>
+            <span className="text-[10px] font-medium text-white/40 uppercase tracking-widest">Metodo</span>
+          </Link>
+          <nav className="flex items-center gap-1">
+            {navItems.map(({ path, label }) => (
+              <NavLink
+                key={path}
+                to={path}
+                className={({ isActive }) =>
+                  `px-3 py-2 rounded-lg text-sm font-medium no-underline transition-colors ${
+                    isActive
+                      ? 'bg-white/10 text-white'
+                      : 'text-white/50 hover:text-white hover:bg-white/5'
+                  }`
+                }
+              >
+                {label}
+              </NavLink>
+            ))}
+          </nav>
         </div>
       </header>
-      <main className="flex-1">
+      <main className="flex-1 pt-16">
         <Outlet />
       </main>
-      <footer className="border-t border-surface-lighter py-6 text-center text-sm text-slate-500">
-        Metodo CRIA — Triadeflow &copy; {new Date().getFullYear()}
+      <footer className="border-t border-white/10 py-8 bg-[#001323]">
+        <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 bg-brand-500 rounded flex items-center justify-center">
+              <span className="text-white font-bold text-[8px]">C</span>
+            </div>
+            <span className="text-sm font-semibold">CRIA</span>
+            <span className="text-xs text-white/40 ml-1">by Triadeflow</span>
+          </div>
+          <p className="text-white/40 text-xs">&copy; {new Date().getFullYear()} Triadeflow. Todos os direitos reservados.</p>
+        </div>
       </footer>
     </div>
   )
