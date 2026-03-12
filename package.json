@@ -5,13 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:server": "node server.js",
     "build": "vite build",
+    "start": "node server.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@rollup/rollup-win32-x64-msvc": "^4.59.0",
     "@tailwindcss/oxide-win32-x64-msvc": "^4.2.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
     "lightningcss-win32-x64-msvc": "^1.32.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
