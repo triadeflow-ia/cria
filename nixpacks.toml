@@ -1,8 +1,5 @@
 [phases.install]
-cmds = ["npm install --omit=optional"]
-
-[phases.build]
-cmds = ["npm run build"]
+cmds = ["npm install --omit=dev --omit=optional"]
 
 [start]
 cmd = "npm start"
