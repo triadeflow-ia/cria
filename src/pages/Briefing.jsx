@@ -252,7 +252,10 @@ export default function Briefing() {
     setGenerating(true)
     setError(null)
     try {
-      const res = await fetch('/api/generate', {
+      const API_URL = window.location.hostname === 'localhost'
+        ? '/api/generate'
+        : 'https://cria-production.up.railway.app/api/generate'
+      const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ briefing: data }),
