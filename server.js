@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import Anthropic from '@anthropic-ai/sdk'
+import { Client } from '@notionhq/client'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import dotenv from 'dotenv'
@@ -19,12 +20,86 @@ app.use(express.static(join(__dirname, 'dist')))
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
+// Notion
+const notion = process.env.NOTION_API_KEY ? new Client({ auth: process.env.NOTION_API_KEY }) : null
+const NOTION_DB_ID = process.env.NOTION_DATABASE_ID || 'fb310ef9af3440818163001cd4d11351'
+
+async function saveToNotion(briefing) {
+  if (!notion) return null
+  try {
+    const canais = Array.isArray(briefing.canais) ? briefing.canais : []
+    const page = await notion.pages.create({
+      parent: { database_id: NOTION_DB_ID },
+      properties: {
+        'Empresa': { title: [{ text: { content: briefing.empresa || 'Sem nome' } }] },
+        'Status': { select: { name: 'Novo' } },
+        'Responsavel': { rich_text: [{ text: { content: briefing.responsavel || '' } }] },
+        'Nicho': { rich_text: [{ text: { content: briefing.nicho || '' } }] },
+        'Objetivo': briefing.objetivo ? { select: { name: briefing.objetivo } } : undefined,
+        'Canais': canais.length ? { multi_select: canais.map(c => ({ name: c })) } : undefined,
+        'Nome Agente': { rich_text: [{ text: { content: briefing.nome_agente || '' } }] },
+        'Tom': briefing.tom ? { select: { name: briefing.tom } } : undefined,
+        'WhatsApp': { phone_number: briefing.whatsapp || null },
+        'Instagram': { rich_text: [{ text: { content: briefing.instagram || '' } }] },
+        'Site': briefing.site ? { url: briefing.site } : undefined,
+        'Cidade': { rich_text: [{ text: { content: briefing.cidade || '' } }] },
+        'Volume Msgs/Dia': { rich_text: [{ text: { content: briefing.volume || '' } }] },
+      }
+    })
+
+    // Add briefing completo como conteudo da pagina
+    const briefingText = formatBriefing(briefing)
+    await notion.blocks.children.append({
+      block_id: page.id,
+      children: [
+        { heading_2: { rich_text: [{ text: { content: 'Briefing Completo' } }] } },
+        { code: { rich_text: [{ text: { content: briefingText.slice(0, 2000) } }], language: 'markdown' } },
+      ]
+    })
+
+    return page.id
+  } catch (err) {
+    console.error('Notion save error:', err.message)
+    return null
+  }
+}
+
+async function updateNotionWithDocs(pageId, docs) {
+  if (!notion || !pageId) return
+  try {
+    await notion.pages.update({
+      page_id: pageId,
+      properties: { 'Status': { select: { name: 'Docs Gerados' } } }
+    })
+
+    const blocks = []
+    blocks.push({ divider: {} })
+    blocks.push({ heading_1: { rich_text: [{ text: { content: 'Documentos Gerados pela IA' } }] } })
+
+    for (const doc of docs) {
+      blocks.push({ heading_2: { rich_text: [{ text: { content: doc.title } }] } })
+      // Notion blocks have 2000 char limit — split if needed
+      const chunks = doc.content.match(/.{1,2000}/gs) || []
+      for (const chunk of chunks) {
+        blocks.push({ code: { rich_text: [{ text: { content: chunk } }], language: 'markdown' } })
+      }
+    }
+
+    await notion.blocks.children.append({ block_id: pageId, children: blocks.slice(0, 100) })
+  } catch (err) {
+    console.error('Notion update error:', err.message)
+  }
+}
+
 app.post('/api/generate', async (req, res) => {
   try {
     const { briefing } = req.body
     if (!briefing || typeof briefing !== 'object') {
       return res.status(400).json({ error: 'Briefing data is required' })
     }
+
+    // Save briefing to Notion
+    const notionPageId = await saveToNotion(briefing)
 
     const briefingText = formatBriefing(briefing)
 
@@ -102,6 +177,9 @@ Responda APENAS com os 5 documentos separados por ===DOC_SEPARATOR===. Comece ca
       title: docTitles[i] || `Documento ${i + 1}`,
       content
     }))
+
+    // Update Notion with generated docs
+    await updateNotionWithDocs(notionPageId, result)
 
     res.json({
       success: true,
