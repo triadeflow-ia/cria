@@ -4,6 +4,10 @@ import Anthropic from '@anthropic-ai/sdk'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import dotenv from 'dotenv'
+// Dynamic imports with top-level await
+const { analyzeProject } = await import('./src/engine/decision-engine.js')
+const { db, schema } = await import('./src/db/index.js')
+console.log('[CRIA] Engine + DB loaded')
 
 dotenv.config()
 
@@ -242,6 +246,48 @@ Responda APENAS com os 5 documentos separados por ===DOC_SEPARATOR===. Comece ca
   }
 })
 
+// CRIA Engine API routes
+app.post('/api/analyze', (req, res) => {
+  try {
+    const { briefing } = req.body
+    if (!briefing) return res.status(400).json({ error: 'Briefing obrigatorio' })
+    const plan = analyzeProject(briefing)
+    res.json({ success: true, plan })
+  } catch (error) {
+    console.error('Analyze error:', error.message)
+    res.status(500).json({ error: error.message })
+  }
+})
+
+app.post('/api/projects', async (req, res) => {
+  try {
+    const { briefing, deployMode = 'managed' } = req.body
+    if (!briefing?.empresa) return res.status(400).json({ error: 'Briefing com empresa obrigatorio' })
+
+    const plan = analyzeProject(briefing)
+    const slug = (briefing.empresa || 'projeto').toLowerCase().replace(/[^a-z0-9]/g, '-')
+
+    const [org] = await db.insert(schema.organizations).values({
+      name: briefing.empresa, email: briefing.email_responsavel || 'sem@email.com', phone: briefing.whatsapp || null,
+    }).returning()
+
+    const [project] = await db.insert(schema.projects).values({
+      orgId: org.id, name: briefing.empresa, slug, deployMode,
+      crmType: plan.crmType, crmOther: briefing.crm_outro || null,
+      agentName: briefing.nome_agente || 'Agente', agentType: plan.agentType,
+      niche: plan.niche, channels: briefing.canais || ['WhatsApp'], config: {},
+    }).returning()
+
+    await db.insert(schema.briefings).values({ projectId: project.id, data: briefing })
+    await db.insert(schema.auditLogs).values({ orgId: org.id, projectId: project.id, action: 'project.create', details: { plan: plan.summary } })
+
+    res.json({ success: true, project: { id: project.id, slug, name: project.name }, plan })
+  } catch (error) {
+    console.error('Project create error:', error.message)
+    res.status(500).json({ error: error.message })
+  }
+})
+
 function formatBriefing(data) {
   const sections = [
     {
@@ -405,5 +451,5 @@ app.use((req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`CRIA server running on port ${PORT}`)
-  console.log(`Notion: ${NOTION_TOKEN ? 'ON' : 'OFF'} | Webhook: ${WEBHOOK_URL ? 'ON' : 'OFF'}`)
+  console.log(`DB: ${process.env.DATABASE_URL ? 'ON' : 'OFF'} | Notion: ${NOTION_TOKEN ? 'ON' : 'OFF'} | Webhook: ${WEBHOOK_URL ? 'ON' : 'OFF'}`)
 })
