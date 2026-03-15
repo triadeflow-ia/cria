@@ -7,7 +7,8 @@ import dotenv from 'dotenv'
 // Dynamic imports with top-level await
 const { analyzeProject } = await import('./src/engine/decision-engine.js')
 const { db, schema } = await import('./src/db/index.js')
-console.log('[CRIA] Engine + DB loaded')
+const messagesRouter = (await import('./src/routes/messages.js')).default
+console.log('[CRIA] Engine + DB + Messages loaded')
 
 dotenv.config()
 
@@ -245,6 +246,9 @@ Responda APENAS com os 5 documentos separados por ===DOC_SEPARATOR===. Comece ca
     })
   }
 })
+
+// Messages API (usado pelos workflows n8n)
+app.use('/api', messagesRouter)
 
 // CRIA Engine API routes
 app.post('/api/analyze', (req, res) => {
