@@ -300,7 +300,10 @@ export default function Briefing() {
   const [currentStep, setCurrentStep] = useState(0)
   const [data, setData] = useState({})
   const [generating, setGenerating] = useState(false)
+  const [genPhase, setGenPhase] = useState('') // 'analyzing', 'saving', 'generating'
   const [result, setResult] = useState(null)
+  const [plan, setPlan] = useState(null)
+  const [projectId, setProjectId] = useState(null)
   const [error, setError] = useState(null)
   const [activeDoc, setActiveDoc] = useState(0)
 
@@ -334,24 +337,47 @@ export default function Briefing() {
     setGenerating(true)
     setError(null)
     try {
-      const API_URL = window.location.hostname === 'localhost'
-        ? '/api/generate'
-        : `${window.location.origin}/api/generate`
-      const res = await fetch(API_URL, {
+      // Step 1: Analyze briefing
+      setGenPhase('Analisando briefing...')
+      const analyzeRes = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ briefing: data }),
       })
-      if (!res.ok) {
-        const err = await res.json()
+      if (!analyzeRes.ok) throw new Error('Erro ao analisar briefing')
+      const { plan: analyzedPlan } = await analyzeRes.json()
+      setPlan(analyzedPlan)
+
+      // Step 2: Save project to database
+      setGenPhase('Salvando projeto...')
+      const projectRes = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ briefing: data }),
+      })
+      if (projectRes.ok) {
+        const { project } = await projectRes.json()
+        setProjectId(project.id)
+      }
+
+      // Step 3: Generate docs with AI
+      setGenPhase('Gerando documentos com IA...')
+      const genRes = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ briefing: data }),
+      })
+      if (!genRes.ok) {
+        const err = await genRes.json()
         throw new Error(err.error || 'Erro ao gerar documentos')
       }
-      const json = await res.json()
-      setResult(json)
+      const json = await genRes.json()
+      setResult({ ...json, plan: analyzedPlan })
     } catch (err) {
       setError(err.message)
     } finally {
       setGenerating(false)
+      setGenPhase('')
     }
   }
 
@@ -390,16 +416,61 @@ export default function Briefing() {
   }
 
   if (result) {
+    const p = result.plan
     return (
       <div className="min-h-screen bg-[#001323] text-white font-['Exo_2',sans-serif]">
         <div className="max-w-5xl mx-auto px-4 py-8">
           <div className="text-center mb-10">
             <span className="text-brand-400 text-xs font-bold uppercase tracking-widest mb-4 block">Resultado</span>
-            <h1 className="text-3xl font-bold text-white mb-2">Documentacao gerada</h1>
+            <h1 className="text-3xl font-bold text-white mb-2">Agente criado com sucesso</h1>
             <p className="text-white/50">
-              {result.docs.length} documentos criados para <span className="text-white font-semibold">{result.empresa}</span>
+              {result.docs.length} documentos + {p?.totalWorkflows || 0} workflows para <span className="text-white font-semibold">{result.empresa}</span>
             </p>
           </div>
+
+          {p && (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+              <div className="rounded-xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div className="text-2xl mb-1">{p.crmType === 'ghl' ? '🚀' : '💬'}</div>
+                <div className="text-xs text-white/40">CRM</div>
+                <div className="text-sm font-semibold text-white">{p.crmType?.toUpperCase()}</div>
+              </div>
+              <div className="rounded-xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div className="text-2xl mb-1">🎯</div>
+                <div className="text-xs text-white/40">Tipo</div>
+                <div className="text-sm font-semibold text-white capitalize">{p.agentType}</div>
+              </div>
+              <div className="rounded-xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div className="text-2xl mb-1">🔧</div>
+                <div className="text-xs text-white/40">Tools</div>
+                <div className="text-sm font-semibold text-white">{p.tools?.length || 0}</div>
+              </div>
+              <div className="rounded-xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div className="text-2xl mb-1">⚡</div>
+                <div className="text-xs text-white/40">Workflows</div>
+                <div className="text-sm font-semibold text-white">{p.totalWorkflows}</div>
+              </div>
+            </div>
+          )}
+
+          {p?.workflowsToDeploy && (
+            <div className="rounded-xl mb-8 overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="px-5 py-3 border-b border-white/10">
+                <h3 className="text-sm font-semibold text-white/70">Workflows que serao criados</h3>
+              </div>
+              <div className="divide-y divide-white/5">
+                {p.workflowsToDeploy.map((wf, i) => (
+                  <div key={i} className="px-5 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 text-white/40 font-mono">{wf.type}</span>
+                      <span className="text-sm text-white">{wf.name}</span>
+                    </div>
+                    {wf.reason && <span className="text-xs text-white/30">{wf.reason}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-2 mb-6">
             {result.docs.map((doc, i) => (
@@ -443,7 +514,13 @@ export default function Briefing() {
             </button>
           </div>
 
-          <div className="text-center mt-12 text-sm text-white/30">
+          {projectId && (
+            <div className="text-center mt-6 text-xs text-white/20">
+              Projeto salvo — ID: {projectId}
+            </div>
+          )}
+
+          <div className="text-center mt-8 text-sm text-white/30">
             Metodo CRIA — Triadeflow &copy; {new Date().getFullYear()}
           </div>
         </div>
@@ -563,7 +640,7 @@ export default function Briefing() {
               disabled={generating}
               className="bg-white text-surface-900 font-semibold px-8 py-3 rounded-md hover:bg-surface-100 transition-colors disabled:opacity-60"
             >
-              {generating ? 'Gerando documentos...' : 'Gerar com IA'}
+              {generating ? (genPhase || 'Processando...') : 'Gerar com IA'}
             </button>
           )}
         </div>
