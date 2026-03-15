@@ -155,11 +155,15 @@ const steps = [
   },
   {
     id: 10,
-    title: 'Integracao e Tecnologia',
-    description: 'Sistemas e ferramentas que o agente precisa se conectar',
+    title: 'Integracao e CRM',
+    description: 'Escolha o CRM onde o agente sera integrado — isso define os workflows automaticos',
     fields: [
-      { name: 'crm', label: 'Usa algum CRM? Qual?', type: 'select', options: ['GHL/GoHighLevel', 'HubSpot', 'RD Station', 'Pipedrive', 'Salesforce', 'Nenhum', 'Outro'] },
-      { name: 'crm_outro', label: 'Se outro CRM, qual?', type: 'text' },
+      { name: 'crm', label: 'Qual CRM voce quer integrar com o agente?', type: 'crm_select', options: ['Kommo', 'GHL/GoHighLevel', 'Outro'], required: true },
+      { name: 'crm_outro', label: 'Qual CRM voce usa?', type: 'text', placeholder: 'ex: HubSpot, RD Station, Pipedrive, Salesforce...', condition: { field: 'crm', value: 'Outro' } },
+      { name: 'kommo_subdomain', label: 'Subdominio da sua conta Kommo', type: 'text', placeholder: 'ex: suaempresa (de suaempresa.kommo.com)', condition: { field: 'crm', value: 'Kommo' } },
+      { name: 'kommo_pipeline', label: 'Nome do pipeline principal', type: 'text', placeholder: 'ex: Vendas, Atendimento, Leads', condition: { field: 'crm', value: 'Kommo' } },
+      { name: 'ghl_location_id', label: 'Location ID do GHL', type: 'text', placeholder: 'ex: wYddnBo2ugaSkHsO3QWk', condition: { field: 'crm', value: 'GHL/GoHighLevel' } },
+      { name: 'ghl_pipeline', label: 'Nome do pipeline principal', type: 'text', placeholder: 'ex: Vendas, Atendimento, Leads', condition: { field: 'crm', value: 'GHL/GoHighLevel' } },
       { name: 'automacao', label: 'Plataforma de automacao', type: 'select', options: ['n8n', 'Zapier', 'Make', 'Manychat', 'ActiveCampaign', 'Nenhuma', 'Outra'] },
       { name: 'sistema_pedidos', label: 'Sistema de pedidos/agendamento', type: 'text', placeholder: 'ex: iFood, Degusta.ai, Calendly, Google Agenda' },
       { name: 'integracoes_necessarias', label: 'O agente precisa se integrar com algum sistema?', type: 'textarea', placeholder: 'Descreva quais sistemas e como a integracao deveria funcionar' },
@@ -218,7 +222,43 @@ const TOTAL_STEPS = steps.length
 
 const inputClass = 'w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-brand-400 transition-colors text-sm'
 
+function CrmSelectInput({ field, value, onChange }) {
+  const crms = [
+    { id: 'Kommo', label: 'Kommo', desc: 'CRM completo com chat integrado', icon: '💬', color: 'from-blue-500/20 to-blue-600/10 border-blue-400/30' },
+    { id: 'GHL/GoHighLevel', label: 'GoHighLevel', desc: 'CRM + automacao all-in-one', icon: '🚀', color: 'from-emerald-500/20 to-emerald-600/10 border-emerald-400/30' },
+    { id: 'Outro', label: 'Outro CRM', desc: 'HubSpot, Pipedrive, RD Station...', icon: '🔧', color: 'from-white/10 to-white/5 border-white/20' },
+  ]
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      {crms.map(crm => (
+        <button
+          key={crm.id}
+          type="button"
+          onClick={() => onChange(field.name, crm.id)}
+          className={`relative p-5 rounded-xl border-2 transition-all text-left ${
+            value === crm.id
+              ? `bg-gradient-to-br ${crm.color} scale-[1.02] shadow-lg`
+              : 'bg-white/3 border-white/10 hover:border-white/20 hover:bg-white/5'
+          }`}
+        >
+          {value === crm.id && (
+            <div className="absolute top-3 right-3 w-5 h-5 bg-white rounded-full flex items-center justify-center">
+              <span className="text-surface-900 text-xs font-bold">✓</span>
+            </div>
+          )}
+          <span className="text-2xl block mb-2">{crm.icon}</span>
+          <span className="text-white font-semibold block text-sm">{crm.label}</span>
+          <span className="text-white/40 text-xs block mt-1">{crm.desc}</span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
 function FieldInput({ field, value, onChange }) {
+  if (field.type === 'crm_select') {
+    return <CrmSelectInput field={field} value={value} onChange={onChange} />
+  }
   if (field.type === 'textarea') {
     return <textarea className={`${inputClass} min-h-[100px] resize-y`} value={value || ''} onChange={e => onChange(field.name, e.target.value)} placeholder={field.placeholder} />
   }
@@ -486,7 +526,11 @@ export default function Briefing() {
               </div>
             ))
           ) : (
-            step.fields.filter(f => !f.hidden).map(f => (
+            step.fields.filter(f => {
+              if (f.hidden) return false
+              if (f.condition) return data[f.condition.field] === f.condition.value
+              return true
+            }).map(f => (
               <div key={f.name}>
                 <label className="block text-sm font-medium text-white/70 mb-2">
                   {f.label} {f.required && <span className="text-brand-300">*</span>}

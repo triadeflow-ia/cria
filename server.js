@@ -106,6 +106,16 @@ async function sendWebhook(type, data) {
   }
 }
 
+// Health check — mostra status das integracoes
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    notion: !!(NOTION_TOKEN && NOTION_DB_ID),
+    webhook: !!WEBHOOK_URL,
+    env_keys: Object.keys(process.env).filter(k => k.startsWith('NOTION') || k.startsWith('WEBHOOK') || k === 'NODE_ENV')
+  })
+})
+
 app.post('/api/generate', async (req, res) => {
   try {
     const { briefing } = req.body
